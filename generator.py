@@ -1,4 +1,4 @@
-import strgen, ctypes, os
+import strgen, ctypes, os, threading
 
 
 class Discord:
@@ -7,14 +7,13 @@ class Discord:
         self.generated = 0
 
 
-    def generate(self, amount):
-        for _ in range(amount):
-            discordToken = strgen.StringGenerator(self.regularExpression).render()
-            discordToken = discordToken.replace("..", ".")
-            print(discordToken)
-            self.generated += 1
-            self.write(discordToken)
-            self.title()
+    def generate(self):
+        discordToken = strgen.StringGenerator(self.regularExpression).render()
+        discordToken = discordToken.replace("..", ".")
+        print(discordToken)
+        self.generated += 1
+        self.write(discordToken)
+        self.title()
     
     def write(self, discordToken):
         if os.path.isfile("./tokens.txt"):
@@ -31,4 +30,5 @@ if __name__ == "__main__":
     open("./tokens.txt", "w").close() # Create and clear our token file each time
     token = Discord()
     amountToGen = int(input("Enter amount of tokens to generate: "))
-    token.generate(amountToGen)
+    for _ in range(amountToGen):
+        threading.Thread(target=token.generate).start()
